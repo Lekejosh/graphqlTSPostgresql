@@ -20,12 +20,14 @@ export const AuthMutation = extendType({
     t.nonNull.field("login", {
       type: "AuthType",
       args: {
-        username: nonNull(stringArg()),
+        emailOrUsername: nonNull(stringArg()),
         password: nonNull(stringArg()),
       },
       async resolve(_parent, args, _context: Context, _info) {
-        const { username, password } = args;
-        const user = await User.findOne({ where: { username } });
+        const { emailOrUsername, password } = args;
+        const user = await User.findOne({
+          where: [{ username: emailOrUsername }, { email: emailOrUsername }],
+        });
 
         if (!user) {
           throw new Error("User not found");
@@ -70,7 +72,8 @@ export const AuthMutation = extendType({
 
           token = jwt.sign(
             { userId: user.id },
-            process.env.TOKEN_SECRET as jwt.Secret,{expiresIn:process.env.TOKEN_EXPIRE}
+            process.env.TOKEN_SECRET as jwt.Secret,
+            { expiresIn: process.env.TOKEN_EXPIRE }
           );
         } catch (err) {
           console.log(err);
@@ -79,6 +82,5 @@ export const AuthMutation = extendType({
         return { user, token };
       },
     });
-   
   },
 });

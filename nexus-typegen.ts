@@ -127,8 +127,8 @@ export interface NexusGenArgTypes {
       price: number; // Float!
     }
     login: { // args
+      emailOrUsername: string; // String!
       password: string; // String!
-      username: string; // String!
     }
     product: { // args
       id: string; // String!
