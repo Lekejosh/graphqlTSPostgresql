@@ -2,15 +2,15 @@ import { extendType, nonNull, objectType, stringArg } from "nexus";
 import { Context } from "src/types/Context";
 import argon2 from "argon2";
 import { User } from "../entities/User";
-import * as jwt from "jsonwebtoken"
+import * as jwt from "jsonwebtoken";
 
 export const AuthType = objectType({
   name: "AuthType",
   definition(t) {
-    t.nonNull.string("token"),
-      t.nonNull.field("user", {
-        type: "User",
-      });
+    t.nonNull.string("token");
+    t.nonNull.field("user", {
+      type: "User",
+    });
   },
 });
 
@@ -18,27 +18,34 @@ export const AuthMutation = extendType({
   type: "Mutation",
   definition(t) {
     t.nonNull.field("login", {
-type:"AuthType",
-args:{username:nonNull(stringArg()),password:nonNull(stringArg())}
-async resolve(_parent,args,_context:Context,_info){
-  const {username,password}=args
-  const user = await User.findOne({where:{username}})
+      type: "AuthType",
+      args: {
+        username: nonNull(stringArg()),
+        password: nonNull(stringArg()),
+      },
+      async resolve(_parent, args, _context: Context, _info) {
+        const { username, password } = args;
+        const user = await User.findOne({ where: { username } });
 
-  if(!user){
-    throw new Error("User not found")
-  }
+        if (!user) {
+          throw new Error("User not found");
+        }
 
-  const isValid = await argon2.verify(user.password,password)
+        const isValid = await argon2.verify(user.password, password);
 
-  if(!isValid){
-    throw new Error("Invalid credentials")
-  }
+        if (!isValid) {
+          throw new Error("Invalid credentials");
+        }
 
-  const token = jwt.sign({userId:user.id},process.env.TOKEN_SECRET as jwt.secret)
-  return {user,token}
-}
-    })
-    t.nonNull.string("register", {
+        const token = jwt.sign(
+          { userId: user.id },
+          process.env.TOKEN_SECRET as jwt.Secret,
+          { expiresIn: process.env.TOKEN_EXPIRE }
+        );
+        return { user, token };
+      },
+    });
+    t.nonNull.field("register", {
       type: "AuthType",
       args: {
         username: nonNull(stringArg()),
@@ -60,9 +67,10 @@ async resolve(_parent,args,_context:Context,_info){
             .execute();
 
           user = result.raw[0];
+
           token = jwt.sign(
             { userId: user.id },
-            process.env.TOKEN_SECRET as jwt.secret
+            process.env.TOKEN_SECRET as jwt.Secret,{expiresIn:process.env.TOKEN_EXPIRE}
           );
         } catch (err) {
           console.log(err);
@@ -71,5 +79,6 @@ async resolve(_parent,args,_context:Context,_info){
         return { user, token };
       },
     });
+   
   },
 });

@@ -10,24 +10,27 @@ type AuthType {
 type Mutation {
   createProduct(name: String!, price: Float!): Product!
   login(password: String!, username: String!): AuthType!
+  product(id: String!, name: String, price: Float): Product!
   register(email: String!, password: String!, username: String!): AuthType!
+  user(email: String, username: String): User!
 }
 
 type Product {
   createdBy: User
-  creatorId: Int!
-  id: Int!
+  creatorId: String!
+  id: String!
   name: String!
   price: Float!
 }
 
 type Query {
+  product(id: String!): Product!
   products: [Product!]!
 }
 
 type User {
   email: String!
-  id: Int!
+  id: String!
   password: String!
   username: String!
 }
