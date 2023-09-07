@@ -1,15 +1,24 @@
-import * as jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 
 export interface AuthTokenPayload {
-    userId:number
+  userId: number;
 }
 
-export const auth =(header:string):AuthTokenPayload =>{
-    const token = header.split(" ")[1]
+export const auth = (header: string): AuthTokenPayload => {
+  const token = header.split(" ")[1];
+  if (!token) throw new Error("Invalid token");
 
-    if(!token) throw new Error("Invalid token")
-
-    const res = jwt.verify(token, process.env.TOKEN_SECRET as jwt.secret);
-console.log(res)
-    return jwt.verify(token, process.env.TOKEN_SECRET as jwt.secret);
-}
+  try {
+    const payload = jwt.verify(
+      token,
+      process.env.access_token_secret as jwt.Secret
+    );
+    if (typeof payload === "object" && "userId" in payload) {
+      return payload as AuthTokenPayload;
+    } else {
+      throw new Error("Invalid token payload");
+    }
+  } catch (error) {
+    throw new Error("Invalid token: " + error.message);
+  }
+};

@@ -44,6 +44,7 @@ export interface NexusGenObjects {
     email: string; // String!
     id: string; // String!
     password: string; // String!
+    refreshToken: string; // String!
     username: string; // String!
   }
 }
@@ -67,6 +68,7 @@ export interface NexusGenFieldTypes {
     createProduct: NexusGenRootTypes['Product']; // Product!
     login: NexusGenRootTypes['AuthType']; // AuthType!
     product: NexusGenRootTypes['Product']; // Product!
+    refreshToken: NexusGenRootTypes['AuthType']; // AuthType!
     register: NexusGenRootTypes['AuthType']; // AuthType!
     user: NexusGenRootTypes['User']; // User!
   }
@@ -85,6 +87,7 @@ export interface NexusGenFieldTypes {
     email: string; // String!
     id: string; // String!
     password: string; // String!
+    refreshToken: string; // String!
     username: string; // String!
   }
 }
@@ -98,6 +101,7 @@ export interface NexusGenFieldTypeNames {
     createProduct: 'Product'
     login: 'AuthType'
     product: 'Product'
+    refreshToken: 'AuthType'
     register: 'AuthType'
     user: 'User'
   }
@@ -116,6 +120,7 @@ export interface NexusGenFieldTypeNames {
     email: 'String'
     id: 'String'
     password: 'String'
+    refreshToken: 'String'
     username: 'String'
   }
 }

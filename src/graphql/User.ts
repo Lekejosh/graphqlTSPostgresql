@@ -9,6 +9,7 @@ export const UserType = objectType({
       t.nonNull.string("username"),
       t.nonNull.string("password"),
       t.nonNull.string("email");
+      t.nonNull.string("refreshToken")
   },
 });
 

@@ -8,11 +8,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Product } from "./Product";
 import { v4 as uuidv4 } from "uuid";
+import { Product } from "./Product";
+
 @Entity()
 export class User extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column({ unique: true })
@@ -33,7 +34,9 @@ export class User extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-//   // Generate a UUID for the 'id' field before inserting into the database
+  @Column({ type: "text", nullable: true }) 
+  refreshToken: string | null;
+
   @BeforeInsert()
   generateId() {
     if (!this.id) {

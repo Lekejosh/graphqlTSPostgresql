@@ -11,6 +11,7 @@ type Mutation {
   createProduct(name: String!, price: Float!): Product!
   login(emailOrUsername: String!, password: String!): AuthType!
   product(id: String!, name: String, price: Float): Product!
+  refreshToken: AuthType!
   register(email: String!, password: String!, username: String!): AuthType!
   user(email: String, username: String): User!
 }
@@ -32,5 +33,6 @@ type User {
   email: String!
   id: String!
   password: String!
+  refreshToken: String!
   username: String!
 }
