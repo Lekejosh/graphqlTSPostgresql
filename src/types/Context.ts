@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 
 export type Context = {
   conn: DataSource;
-  userId: number | undefined;
+  userId: string | undefined;
   req: Request;
   res: Response;
 };

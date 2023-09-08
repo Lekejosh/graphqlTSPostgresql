@@ -5,12 +5,14 @@ import typeomConfig from "./typeorm.config";
 import { Context } from "./types/Context";
 import { auth } from "./middlewares/auth";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
 
 const boot = async (): Promise<void> => {
   const conn = await typeomConfig.initialize();
 
   const app = express();
   app.use(cookieParser());
+  app.use(helmet());
 
   const server = new ApolloServer({
     schema,

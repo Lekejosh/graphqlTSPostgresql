@@ -1,7 +1,6 @@
-import { extendType, floatArg, nonNull, objectType, stringArg } from "nexus";
-import { NexusGenObjects } from "../../nexus-typegen";
+import { extendType, nonNull, objectType, stringArg, floatArg } from "nexus"; // Fixed the import order
 import { Product } from "../entities/Product";
-import { Context } from "src/types/Context";
+import { Context } from "../types/Context"; // Fixed the import path
 import { User } from "../entities/User";
 
 export const ProductType = objectType({
@@ -10,11 +9,13 @@ export const ProductType = objectType({
     t.nonNull.string("id"),
       t.nonNull.string("name"),
       t.nonNull.float("price"),
-      t.nonNull.string("creatorId"),t.field("createdBy",{
-        type:'User',
-        resolve(parent,_args,_context:Context,_info):Promise<User | null>{
-          return User.findOne({where:{id:parent.creatorId}})
-      })
+      t.nonNull.string("creatorId");
+    t.field("createdBy", {
+      type: "User",
+      resolve(parent, _args, _context: Context, _info): Promise<User | null> {
+        return User.findOne({ where: { id: parent.creatorId } });
+      },
+    });
   },
 });
 
@@ -23,9 +24,8 @@ export const ProductQuery = extendType({
   definition(t) {
     t.nonNull.list.nonNull.field("products", {
       type: "Product",
-      resolve(_parent, _args, context: Context, _info): Promise<Product[]> {
-
-       return Product.find()
+      resolve(_parent, _args, _context: Context, _info): Promise<Product[]> {
+        return Product.find();
       },
     });
   },
@@ -45,7 +45,7 @@ export const CreateProductMutation = extendType({
         const { userId } = context;
 
         if (!userId) {
-          throw new Error("Can't create product, without loggin in");
+          throw new Error("Can't create a product without logging in");
         }
         return Product.create({ name, price, creatorId: userId }).save();
       },
@@ -56,12 +56,12 @@ export const CreateProductMutation = extendType({
 export const UpdateProduct = extendType({
   type: "Mutation",
   definition(t) {
-    t.nonNull.field('product', {
+    t.nonNull.field("updateProduct", {
       type: "Product",
       args: {
         id: nonNull(stringArg()),
-        price: floatArg(), 
-        name: stringArg(), 
+        price: floatArg(),
+        name: stringArg(),
       },
       async resolve(_parent, args, context: Context, _info) {
         const { id, price, name } = args;
@@ -70,13 +70,13 @@ export const UpdateProduct = extendType({
         if (!product) {
           throw new Error("Product not found");
         }
-const {userId}=context
+        const { userId } = context;
 
-if(!userId) throw new Error("Please login to access this resources");
+        if (!userId) throw new Error("Please log in to access this resource");
 
-        if(product.creatorId !== userId) throw new Error("You didn't create this product");
+        if (product.creatorId !== userId)
+          throw new Error("You didn't create this product");
 
-        
         if (!price && !name) {
           throw new Error("Either 'price' or 'name' must be provided");
         }
@@ -86,7 +86,7 @@ if(!userId) throw new Error("Please login to access this resources");
         }
 
         if (name) {
-          product.name = name;   
+          product.name = name;
         }
 
         await product.save();
@@ -97,35 +97,35 @@ if(!userId) throw new Error("Please login to access this resources");
   },
 });
 
-
 export const QueryUserProducts = extendType({
-   type: "Query",
+  type: "Query",
   definition(t) {
-    t.nonNull.list.nonNull.field("products", {
+    t.nonNull.list.nonNull.field("userProducts", {
+      // Changed the field name to "userProducts"
       type: "Product",
       resolve(_parent, _args, context: Context, _info): Promise<Product[]> {
- const { userId } = context;
-        if(!userId){
-          throw new Error("Can't product, without loggin in");
+        const { userId } = context;
+        if (!userId) {
+          throw new Error("Can't fetch products without logging in");
         }
-       return Product.find({where:{creatorId:userId}})
+        return Product.find({ where: { creatorId: userId } });
       },
     });
-  }
-})
+  },
+});
 
 export const SingleProduct = extendType({
-   type: "Query",
+  type: "Query",
   definition(t) {
     t.nonNull.field("product", {
       type: "Product",
-      args:{
-        id:nonNull(stringArg())
+      args: {
+        id: nonNull(stringArg()),
       },
-      resolve(_parent, args, _context: Context, _info){
-        const {id} = args
-       return Product.findOne({where:{id:id}})
+      resolve(_parent, args, _context: Context, _info) {
+        const { id } = args;
+        return Product.findOne({ where: { id: id } });
       },
     });
-  }
-})
+  },
+});

@@ -11,10 +11,13 @@ type AuthType {
 type Mutation {
   accessToken: AuthType!
   createProduct(name: String!, price: Float!): Product!
+  forgotPassword(usernameOrEmail: String!): AuthType!
   login(emailOrUsername: String!, password: String!): AuthType!
-  product(id: String!, name: String, price: Float): Product!
   register(email: String!, password: String!, username: String!): AuthType!
-  requestOtp: AuthType
+  requestOtp: AuthType!
+  resetPassword(confirmPassword: String!, newPassword: String!, resetToken: String!): AuthType!
+  updatePassword(confirmPassword: String!, currentPassword: String!, newPassword: String!): AuthType!
+  updateProduct(id: String!, name: String, price: Float): Product!
   user(email: String, username: String): User!
   verifyEmail(otp: String!): AuthType!
 }
@@ -30,6 +33,7 @@ type Product {
 type Query {
   product(id: String!): Product!
   products: [Product!]!
+  userProducts: [Product!]!
 }
 
 type User {

@@ -71,10 +71,13 @@ export interface NexusGenFieldTypes {
   Mutation: { // field return type
     accessToken: NexusGenRootTypes['AuthType']; // AuthType!
     createProduct: NexusGenRootTypes['Product']; // Product!
+    forgotPassword: NexusGenRootTypes['AuthType']; // AuthType!
     login: NexusGenRootTypes['AuthType']; // AuthType!
-    product: NexusGenRootTypes['Product']; // Product!
     register: NexusGenRootTypes['AuthType']; // AuthType!
-    requestOtp: NexusGenRootTypes['AuthType'] | null; // AuthType
+    requestOtp: NexusGenRootTypes['AuthType']; // AuthType!
+    resetPassword: NexusGenRootTypes['AuthType']; // AuthType!
+    updatePassword: NexusGenRootTypes['AuthType']; // AuthType!
+    updateProduct: NexusGenRootTypes['Product']; // Product!
     user: NexusGenRootTypes['User']; // User!
     verifyEmail: NexusGenRootTypes['AuthType']; // AuthType!
   }
@@ -88,6 +91,7 @@ export interface NexusGenFieldTypes {
   Query: { // field return type
     product: NexusGenRootTypes['Product']; // Product!
     products: NexusGenRootTypes['Product'][]; // [Product!]!
+    userProducts: NexusGenRootTypes['Product'][]; // [Product!]!
   }
   User: { // field return type
     email: string; // String!
@@ -109,10 +113,13 @@ export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     accessToken: 'AuthType'
     createProduct: 'Product'
+    forgotPassword: 'AuthType'
     login: 'AuthType'
-    product: 'Product'
     register: 'AuthType'
     requestOtp: 'AuthType'
+    resetPassword: 'AuthType'
+    updatePassword: 'AuthType'
+    updateProduct: 'Product'
     user: 'User'
     verifyEmail: 'AuthType'
   }
@@ -126,6 +133,7 @@ export interface NexusGenFieldTypeNames {
   Query: { // field return type name
     product: 'Product'
     products: 'Product'
+    userProducts: 'Product'
   }
   User: { // field return type name
     email: 'String'
@@ -144,19 +152,32 @@ export interface NexusGenArgTypes {
       name: string; // String!
       price: number; // Float!
     }
+    forgotPassword: { // args
+      usernameOrEmail: string; // String!
+    }
     login: { // args
       emailOrUsername: string; // String!
       password: string; // String!
-    }
-    product: { // args
-      id: string; // String!
-      name?: string | null; // String
-      price?: number | null; // Float
     }
     register: { // args
       email: string; // String!
       password: string; // String!
       username: string; // String!
+    }
+    resetPassword: { // args
+      confirmPassword: string; // String!
+      newPassword: string; // String!
+      resetToken: string; // String!
+    }
+    updatePassword: { // args
+      confirmPassword: string; // String!
+      currentPassword: string; // String!
+      newPassword: string; // String!
+    }
+    updateProduct: { // args
+      id: string; // String!
+      name?: string | null; // String
+      price?: number | null; // Float
     }
     user: { // args
       email?: string | null; // String

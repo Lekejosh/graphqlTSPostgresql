@@ -40,11 +40,17 @@ export class User extends BaseEntity {
   @Column({ type: "text", nullable: true })
   otp: string | null;
 
-  @Column("timestamp",{ nullable: true })
+  @Column("timestamp", { nullable: true })
   otpExpire: Date | null;
 
   @Column()
   isVerified: boolean;
+
+  @Column({ type: "text", nullable: true })
+  resetPasswordToken: string | null;
+
+  @Column("timestamp", { nullable: true })
+  resetPasswordTokenExpire: Date | null;
 
   @BeforeInsert()
   generateId() {

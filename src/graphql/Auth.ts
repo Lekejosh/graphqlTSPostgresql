@@ -6,6 +6,8 @@ import { accessToken, refreshToken } from "../utils/tokens";
 import jwt from "jsonwebtoken";
 import { generateOTP } from "../utils/otpGenerate";
 import { sendEmail } from "../utils/mail";
+import { getPasswordResetToken } from "../utils/passwordResetToken";
+import * as crypto from "crypto";
 
 export const AuthType = objectType({
   name: "AuthType",
@@ -51,7 +53,6 @@ export const AuthMutation = extendType({
         } catch (error) {
           console.error("Error saving user:", error);
         }
-        // Set refresh_token as a cookie in the response
         context.res.cookie("refreshToken", refresh_token, {
           httpOnly: true,
           maxAge: 24 * 60 * 60 * 1000,
@@ -152,7 +153,7 @@ export const AuthMutation = extendType({
           where: { refreshToken: refreshToken },
         });
         if (!user) {
-          const decoded = jwt.verify(
+          await jwt.verify(
             refreshToken,
             process.env.refresh_token_secret!,
             async (err: any, decoded: any) => {
@@ -164,11 +165,10 @@ export const AuthMutation = extendType({
               });
 
               if (hackedUser) {
-                hackedUser?.refreshToken = "null";
+                hackedUser.refreshToken = "null";
                 await hackedUser.save();
                 throw new Error("Token compromised, login again");
               }
-              // Ensure you return a non-null value in all cases
               return { token: "" };
             }
           );
@@ -225,7 +225,7 @@ export const AuthMutation = extendType({
           throw new Error("User not found");
         }
         let presentTime = await Date.now();
-        const date = new Date(user?.otpExpire);
+        const date = new Date(user.otpExpire!);
         const timestamp = date.getTime();
 
         if (otp !== user.otp || presentTime > timestamp) {
@@ -236,6 +236,13 @@ export const AuthMutation = extendType({
         user.otpExpire = null;
         user.otp = null;
         await user.save();
+
+        await sendEmail({
+          email: `${user!.username} <${user!.email}>`,
+          subject: "Email Verified Successfully",
+          html: "Account Verified Successfully",
+        });
+
         return {
           user,
           message: "Email verified successfully",
@@ -243,15 +250,21 @@ export const AuthMutation = extendType({
       },
     });
 
-    t.field("requestOtp", {
+    t.nonNull.field("requestOtp", {
       type: "AuthType",
       async resolve(_parent, _args, context: Context, _info) {
-        if (!context.userId) throw new Error("Login to access this resource");
+        if (!context.userId) {
+          throw new Error("Login to access this resource");
+        }
         const user = await User.findOne({ where: { id: context.userId } });
-
         if (!user) {
           throw new Error("User not found");
         }
+
+        if (user.isVerified) {
+          throw new Error("Account already verified");
+        }
+
         const newOtp = await generateOTP();
         const otpExpireTimestamp = Date.now() + 15 * 60 * 1000;
         const currentDateAndTime = new Date(otpExpireTimestamp);
@@ -273,9 +286,125 @@ export const AuthMutation = extendType({
             console.log(err);
             throw new Error("Error sending Email Verification");
           });
-
-        // Make sure to return a non-null value
         return { user, message: "OTP sent to email" };
+      },
+    });
+    t.nonNull.field("updatePassword", {
+      type: "AuthType",
+      args: {
+        currentPassword: nonNull(stringArg()),
+        newPassword: nonNull(stringArg()),
+        confirmPassword: nonNull(stringArg()),
+      },
+      async resolve(_parent, args, context: Context, _info) {
+        const { currentPassword, newPassword, confirmPassword } = args;
+
+        if (!context.userId) {
+          throw new Error("Login to access this resource");
+        }
+
+        const user = await User.findOne({ where: { id: context.userId } });
+
+        if (!user) {
+          throw new Error("User not found");
+        }
+
+        const isValid = await argon2.verify(user.password, currentPassword);
+        if (!isValid) {
+          throw new Error("Old Password not correct");
+        }
+
+        if (newPassword !== confirmPassword) {
+          throw new Error("Password does not match");
+        }
+        const hashedPassword = await argon2.hash(newPassword);
+        user.password = hashedPassword;
+        await user.save();
+
+        return { user, message: "Password updated, successfully" };
+      },
+    });
+    t.nonNull.field("forgotPassword", {
+      type: "AuthType",
+      args: {
+        usernameOrEmail: nonNull(stringArg()),
+      },
+      async resolve(_parent, args, context: Context, _info) {
+        const { usernameOrEmail } = args;
+        const { req } = context;
+        const user = await User.findOne({
+          where: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+        });
+        if (!user) {
+          throw new Error("User not found");
+        }
+        const tokens = await getPasswordResetToken();
+
+        user.resetPasswordToken = tokens.resetPasswordToken;
+        user.resetPasswordTokenExpire = tokens.resetPasswordTokenExpire;
+        await user.save();
+        const resetPasswordUrl = `${req.protocol}://${req.get(
+          "host"
+        )}/graphql?token=${tokens.resetToken}`;
+        const message = `Your password reset Token is :-\n\n ${resetPasswordUrl} \n\nif you have not requested this email then, please Ignore it`;
+        try {
+          await sendEmail({
+            email: user.email,
+            subject: `User Password Recovery`,
+            html: message,
+          });
+        } catch (error) {
+          user.resetPasswordToken = null;
+          user.resetPasswordTokenExpire = null;
+
+          await user.save();
+          throw new Error("Error sending reset mail");
+        }
+        return { user, message: "Reset Password Mail send Succssfully" };
+      },
+    });
+    t.nonNull.field("resetPassword", {
+      type: "AuthType",
+      args: {
+        resetToken: nonNull(stringArg()),
+        newPassword: nonNull(stringArg()),
+        confirmPassword: nonNull(stringArg()),
+      },
+      async resolve(_parent, args, _context, _info) {
+        const { resetToken, newPassword, confirmPassword } = args;
+        const resetPasswordToken = crypto
+          .createHash("sha256")
+          .update(resetToken)
+          .digest("hex");
+
+        const user = await User.findOne({
+          where: {
+            resetPasswordToken: resetPasswordToken,
+          },
+        });
+
+        if (!user) {
+          throw new Error("Token invalid or has expired");
+        }
+        let presentTime = Date.now();
+        const date = new Date(user.resetPasswordTokenExpire!);
+        const timestamp = date.getTime();
+
+        if (presentTime > timestamp) {
+          throw new Error("Token invalid or has expired");
+        }
+
+        if (newPassword !== confirmPassword) {
+          throw new Error("Password does not match");
+        }
+
+        const hashedPassword = await argon2.hash(newPassword);
+        user.password = hashedPassword;
+        user.resetPasswordToken = null;
+        user.resetPasswordTokenExpire = null;
+        await user.save();
+
+        return { user, message: "Password reset successfull" };
       },
     });
   },
