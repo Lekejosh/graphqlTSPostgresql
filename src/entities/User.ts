@@ -34,8 +34,17 @@ export class User extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type: "text", nullable: true }) 
+  @Column({ type: "text", nullable: true })
   refreshToken: string | null;
+
+  @Column({ type: "text", nullable: true })
+  otp: string | null;
+
+  @Column("timestamp",{ nullable: true })
+  otpExpire: Date | null;
+
+  @Column()
+  isVerified: boolean;
 
   @BeforeInsert()
   generateId() {

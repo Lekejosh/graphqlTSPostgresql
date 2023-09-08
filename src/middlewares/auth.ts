@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 export interface AuthTokenPayload {
-  userId: number;
+  userId: string;
 }
 
 export const auth = (header: string): AuthTokenPayload => {

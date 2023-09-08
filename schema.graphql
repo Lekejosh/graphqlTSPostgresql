@@ -3,17 +3,20 @@
 
 
 type AuthType {
-  token: String!
-  user: User!
+  message: String
+  token: String
+  user: User
 }
 
 type Mutation {
+  accessToken: AuthType!
   createProduct(name: String!, price: Float!): Product!
   login(emailOrUsername: String!, password: String!): AuthType!
   product(id: String!, name: String, price: Float): Product!
-  refreshToken: AuthType!
   register(email: String!, password: String!, username: String!): AuthType!
+  requestOtp: AuthType
   user(email: String, username: String): User!
+  verifyEmail(otp: String!): AuthType!
 }
 
 type Product {
@@ -32,6 +35,8 @@ type Query {
 type User {
   email: String!
   id: String!
+  isVerified: Boolean!
+  otp: String!
   password: String!
   refreshToken: String!
   username: String!

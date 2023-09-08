@@ -29,8 +29,9 @@ export interface NexusGenScalars {
 
 export interface NexusGenObjects {
   AuthType: { // root type
-    token: string; // String!
-    user: NexusGenRootTypes['User']; // User!
+    message?: string | null; // String
+    token?: string | null; // String
+    user?: NexusGenRootTypes['User'] | null; // User
   }
   Mutation: {};
   Product: { // root type
@@ -43,6 +44,8 @@ export interface NexusGenObjects {
   User: { // root type
     email: string; // String!
     id: string; // String!
+    isVerified: boolean; // Boolean!
+    otp: string; // String!
     password: string; // String!
     refreshToken: string; // String!
     username: string; // String!
@@ -61,16 +64,19 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
   AuthType: { // field return type
-    token: string; // String!
-    user: NexusGenRootTypes['User']; // User!
+    message: string | null; // String
+    token: string | null; // String
+    user: NexusGenRootTypes['User'] | null; // User
   }
   Mutation: { // field return type
+    accessToken: NexusGenRootTypes['AuthType']; // AuthType!
     createProduct: NexusGenRootTypes['Product']; // Product!
     login: NexusGenRootTypes['AuthType']; // AuthType!
     product: NexusGenRootTypes['Product']; // Product!
-    refreshToken: NexusGenRootTypes['AuthType']; // AuthType!
     register: NexusGenRootTypes['AuthType']; // AuthType!
+    requestOtp: NexusGenRootTypes['AuthType'] | null; // AuthType
     user: NexusGenRootTypes['User']; // User!
+    verifyEmail: NexusGenRootTypes['AuthType']; // AuthType!
   }
   Product: { // field return type
     createdBy: NexusGenRootTypes['User'] | null; // User
@@ -86,6 +92,8 @@ export interface NexusGenFieldTypes {
   User: { // field return type
     email: string; // String!
     id: string; // String!
+    isVerified: boolean; // Boolean!
+    otp: string; // String!
     password: string; // String!
     refreshToken: string; // String!
     username: string; // String!
@@ -94,16 +102,19 @@ export interface NexusGenFieldTypes {
 
 export interface NexusGenFieldTypeNames {
   AuthType: { // field return type name
+    message: 'String'
     token: 'String'
     user: 'User'
   }
   Mutation: { // field return type name
+    accessToken: 'AuthType'
     createProduct: 'Product'
     login: 'AuthType'
     product: 'Product'
-    refreshToken: 'AuthType'
     register: 'AuthType'
+    requestOtp: 'AuthType'
     user: 'User'
+    verifyEmail: 'AuthType'
   }
   Product: { // field return type name
     createdBy: 'User'
@@ -119,6 +130,8 @@ export interface NexusGenFieldTypeNames {
   User: { // field return type name
     email: 'String'
     id: 'String'
+    isVerified: 'Boolean'
+    otp: 'String'
     password: 'String'
     refreshToken: 'String'
     username: 'String'
@@ -148,6 +161,9 @@ export interface NexusGenArgTypes {
     user: { // args
       email?: string | null; // String
       username?: string | null; // String
+    }
+    verifyEmail: { // args
+      otp: string; // String!
     }
   }
   Query: {

@@ -10,6 +10,8 @@ export const UserType = objectType({
       t.nonNull.string("password"),
       t.nonNull.string("email");
       t.nonNull.string("refreshToken")
+      t.nonNull.boolean("isVerified")
+      t.nonNull.string("otp")
   },
 });
 
