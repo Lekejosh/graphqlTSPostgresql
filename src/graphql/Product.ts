@@ -10,6 +10,7 @@ export const ProductType = objectType({
       t.nonNull.string("name"),
       t.nonNull.float("price"),
       t.nonNull.string("creatorId");
+    t.string("message");
     t.field("createdBy", {
       type: "User",
       resolve(parent, _args, _context: Context, _info): Promise<User | null> {
@@ -74,8 +75,7 @@ export const UpdateProduct = extendType({
 
         if (!userId) throw new Error("Please log in to access this resource");
 
-        if (product.creatorId !== userId)
-          throw new Error("You didn't create this product");
+        if (product.creatorId !== userId) throw new Error("Product not found");
 
         if (!price && !name) {
           throw new Error("Either 'price' or 'name' must be provided");
@@ -125,6 +125,40 @@ export const SingleProduct = extendType({
       resolve(_parent, args, _context: Context, _info) {
         const { id } = args;
         return Product.findOne({ where: { id: id } });
+      },
+    });
+  },
+});
+
+export const DeleteProduct = extendType({
+  type: "Mutation",
+  definition(t) {
+    t.nonNull.field("deleteProduct", {
+      type: "Product",
+      args: {
+        id: nonNull(stringArg()),
+        productName: nonNull(stringArg()),
+      },
+      async resolve(_parent, args, context: Context, _info) {
+        const { id, productName } = args;
+        const { userId } = context;
+        if (!userId) throw new Error("Please Login to access this resource");
+        const product = await Product.findOne({ where: { id } });
+        if (!product) throw new Error("Product does not exist");
+        if (product.creatorId !== userId) throw new Error("Product not found");
+        if (productName === "") {
+          throw new Error(
+            "Please type in the product name to confirm your delete"
+          );
+        }
+        if (productName !== product.name) {
+          throw new Error(
+            "productName must be the same as the product name, in other to confirm your delete"
+          );
+        }
+        await product.remove();
+
+        return { message: "Delete Successful" };
       },
     });
   },

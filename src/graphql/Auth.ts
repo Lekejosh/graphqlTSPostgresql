@@ -121,14 +121,10 @@ export const AuthMutation = extendType({
             email: `${userNew!.username} <${userNew!.email}>`,
             subject: "Veritfy Account",
             html: data,
-          })
-            .then(() => {
-              console.log("Email Sent Successfully");
-            })
-            .catch((err: any) => {
-              console.log(err);
-              throw new Error("Error sending Email Verification");
-            });
+          }).catch((err: any) => {
+            console.log(err);
+            throw new Error("Error sending Email Verification");
+          });
         } catch (err) {
           console.log(err);
         }
@@ -278,14 +274,10 @@ export const AuthMutation = extendType({
           email: `${user!.username} <${user!.email}>`,
           subject: "Verify Account",
           html: data,
-        })
-          .then(() => {
-            console.log("Email Sent Successfully");
-          })
-          .catch((err: any) => {
-            console.log(err);
-            throw new Error("Error sending Email Verification");
-          });
+        }).catch((err: any) => {
+          console.log(err);
+          throw new Error("Error sending Email Verification");
+        });
         return { user, message: "OTP sent to email" };
       },
     });

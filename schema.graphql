@@ -11,6 +11,7 @@ type AuthType {
 type Mutation {
   accessToken: AuthType!
   createProduct(name: String!, price: Float!): Product!
+  deleteProduct(id: String!, productName: String!): Product!
   forgotPassword(usernameOrEmail: String!): AuthType!
   login(emailOrUsername: String!, password: String!): AuthType!
   register(email: String!, password: String!, username: String!): AuthType!
@@ -26,6 +27,7 @@ type Product {
   createdBy: User
   creatorId: String!
   id: String!
+  message: String
   name: String!
   price: Float!
 }

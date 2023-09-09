@@ -37,6 +37,7 @@ export interface NexusGenObjects {
   Product: { // root type
     creatorId: string; // String!
     id: string; // String!
+    message?: string | null; // String
     name: string; // String!
     price: number; // Float!
   }
@@ -70,6 +71,7 @@ export interface NexusGenFieldTypes {
   Mutation: { // field return type
     accessToken: NexusGenRootTypes['AuthType']; // AuthType!
     createProduct: NexusGenRootTypes['Product']; // Product!
+    deleteProduct: NexusGenRootTypes['Product']; // Product!
     forgotPassword: NexusGenRootTypes['AuthType']; // AuthType!
     login: NexusGenRootTypes['AuthType']; // AuthType!
     register: NexusGenRootTypes['AuthType']; // AuthType!
@@ -84,6 +86,7 @@ export interface NexusGenFieldTypes {
     createdBy: NexusGenRootTypes['User'] | null; // User
     creatorId: string; // String!
     id: string; // String!
+    message: string | null; // String
     name: string; // String!
     price: number; // Float!
   }
@@ -112,6 +115,7 @@ export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     accessToken: 'AuthType'
     createProduct: 'Product'
+    deleteProduct: 'Product'
     forgotPassword: 'AuthType'
     login: 'AuthType'
     register: 'AuthType'
@@ -126,6 +130,7 @@ export interface NexusGenFieldTypeNames {
     createdBy: 'User'
     creatorId: 'String'
     id: 'String'
+    message: 'String'
     name: 'String'
     price: 'Float'
   }
@@ -150,6 +155,10 @@ export interface NexusGenArgTypes {
     createProduct: { // args
       name: string; // String!
       price: number; // Float!
+    }
+    deleteProduct: { // args
+      id: string; // String!
+      productName: string; // String!
     }
     forgotPassword: { // args
       usernameOrEmail: string; // String!
