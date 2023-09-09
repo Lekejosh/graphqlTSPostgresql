@@ -45,7 +45,6 @@ export interface NexusGenObjects {
     email: string; // String!
     id: string; // String!
     isVerified: boolean; // Boolean!
-    otp: string; // String!
     password: string; // String!
     refreshToken: string; // String!
     username: string; // String!
@@ -89,6 +88,7 @@ export interface NexusGenFieldTypes {
     price: number; // Float!
   }
   Query: { // field return type
+    me: NexusGenRootTypes['User']; // User!
     product: NexusGenRootTypes['Product']; // Product!
     products: NexusGenRootTypes['Product'][]; // [Product!]!
     userProducts: NexusGenRootTypes['Product'][]; // [Product!]!
@@ -97,7 +97,6 @@ export interface NexusGenFieldTypes {
     email: string; // String!
     id: string; // String!
     isVerified: boolean; // Boolean!
-    otp: string; // String!
     password: string; // String!
     refreshToken: string; // String!
     username: string; // String!
@@ -131,6 +130,7 @@ export interface NexusGenFieldTypeNames {
     price: 'Float'
   }
   Query: { // field return type name
+    me: 'User'
     product: 'Product'
     products: 'Product'
     userProducts: 'Product'
@@ -139,7 +139,6 @@ export interface NexusGenFieldTypeNames {
     email: 'String'
     id: 'String'
     isVerified: 'Boolean'
-    otp: 'String'
     password: 'String'
     refreshToken: 'String'
     username: 'String'

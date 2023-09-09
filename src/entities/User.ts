@@ -25,6 +25,12 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   email: string;
 
+  @Column()
+  isVerified: boolean;
+
+  @Column("jsonb", { nullable: true })
+  profileImage: object[] | null;
+
   @OneToMany(() => Product, (product) => product.creator)
   products: Product[];
 
@@ -42,9 +48,6 @@ export class User extends BaseEntity {
 
   @Column("timestamp", { nullable: true })
   otpExpire: Date | null;
-
-  @Column()
-  isVerified: boolean;
 
   @Column({ type: "text", nullable: true })
   resetPasswordToken: string | null;

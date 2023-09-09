@@ -11,7 +11,6 @@ export const UserType = objectType({
       t.nonNull.string("email");
     t.nonNull.string("refreshToken");
     t.nonNull.boolean("isVerified");
-    t.nonNull.string("otp");
   },
 });
 
@@ -44,6 +43,22 @@ export const UpdateUser = extendType({
           user.username = username;
         }
         await user.save();
+        return user;
+      },
+    });
+  },
+});
+
+export const getMe = extendType({
+  type: "Query",
+  definition(t) {
+    t.nonNull.field("me", {
+      type: "User",
+      async resolve(_parent, _args, context: Context, _info) {
+        const { userId } = context;
+        if (!userId) throw new Error("Login to access this resource");
+        const user = await User.findOne({ where: { id: userId } });
+        if (!user) throw new Error("User not found");
         return user;
       },
     });
