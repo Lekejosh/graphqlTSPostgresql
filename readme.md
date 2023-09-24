@@ -1,6 +1,3 @@
-Certainly! Below is a GitHub README.md file for your TypeScript GraphQL API:
-
-````markdown
 # TypeScript GraphQL API
 
 Welcome to the TypeScript GraphQL API repository. This API serves as a robust backend solution for various applications, providing powerful GraphQL capabilities. This README will guide you through setting up, using, and extending the API to suit your project's needs.
@@ -44,6 +41,7 @@ Before you begin, ensure you have met the following requirements:
    ```bash
    git clone https://github.com/lekejosh/graphqlTSPostgresql.git
    ```
+
 ````
 
 2. Change to the project directory:
@@ -103,5 +101,4 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for de
 This project is licensed under the [LICENSE](LICENSE) - describe your license here.
 
 ```
-
-```
+````
