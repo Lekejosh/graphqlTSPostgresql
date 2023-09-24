@@ -42,8 +42,6 @@ Before you begin, ensure you have met the following requirements:
    git clone https://github.com/lekejosh/graphqlTSPostgresql.git
    ```
 
-````
-
 2. Change to the project directory:
 
    ```bash
@@ -99,6 +97,3 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for de
 ## License
 
 This project is licensed under the [LICENSE](LICENSE) - describe your license here.
-
-```
-````
